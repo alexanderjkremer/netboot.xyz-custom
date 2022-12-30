@@ -3,7 +3,9 @@
 # Microsoft Windows
 # https://www.microsoft.com
 
-set win_arch x64
+set winpe_arch x64
+set win_image Win11_English_x64
+set win_base_url $$win_base_url$$
 goto ${menu} ||
 
 :windows
@@ -13,13 +15,19 @@ menu ${os}
 item --gap Installers
 item win_install ${space} Load ${os} Installer...
 item --gap Options:
-item arch_set ${space} Architecture [ ${win_arch} ]
+item image_set ${space} Image [ ${win_image} ]
+item pe_arch_set ${space} Architecture [ ${winpe_arch} ]
 item url_set ${space} Base URL [ ${win_base_url} ]
 choose win_version || goto windows_exit
 goto ${win_version}
 
-:arch_set
-iseq ${win_arch} x64 && set win_arch x86 || set win_arch x64
+:image_set
+menu Image
+item Win11_English_x64 Win11_English_x64
+choose win_image && goto windows
+
+:pe_arch_set
+iseq ${winpe_arch} x64 && set winpe_arch x86 || set winpe_arch x64
 goto windows
 
 :url_set
@@ -29,12 +37,12 @@ echo
 echo -n URL: ${} && read win_base_url
 echo
 echo netboot.xyz will attempt to load the following files:
-echo ${win_base_url}/${win_arch}/bootmgr
-echo ${win_base_url}/${win_arch}/bootmgr.efi
-echo ${win_base_url}/${win_arch}/boot/bcd
-echo ${win_base_url}/${win_arch}/boot/boot.sdi
-echo ${win_base_url}/${win_arch}/sources/boot.wim
-echo ${win_base_url}/configs/install.bat
+echo ${win_base_url}/${winpe_arch}/bootmgr
+echo ${win_base_url}/${winpe_arch}/bootmgr.efi
+echo ${win_base_url}/${winpe_arch}/boot/bcd
+echo ${win_base_url}/${winpe_arch}/boot/boot.sdi
+echo ${win_base_url}/${winpe_arch}/sources/boot.wim
+echo ${win_base_url}/configs/${win_image}/install.bat
 echo ${win_base_url}/configs/configure.bat
 echo ${win_base_url}/configs/winpeshl.ini
 echo
@@ -47,16 +55,16 @@ isset ${win_base_url} && goto boot || echo URL not set... && goto url_set
 :boot
 imgfree
 kernel http://${boot_domain}/wimboot
-initrd ${win_base_url}/configs/install.bat install.bat
+initrd ${win_base_url}/configs/${win_image}/install.bat install.bat
 initrd ${win_base_url}/configs/configure.bat configure.bat
 initrd ${win_base_url}/configs/winpeshl.ini winpeshl.ini
-initrd -n bootmgr     ${win_base_url}/${win_arch}/bootmgr       bootmgr ||
-initrd -n bootmgr.efi ${win_base_url}/${win_arch}/bootmgr.efi   bootmgr.efi ||      
-initrd -n bcd         ${win_base_url}/${win_arch}/boot/bcd      bcd ||
-initrd -n bcd         ${win_base_url}/${win_arch}/Boot/BCD      bcd ||
-initrd -n boot.sdi    ${win_base_url}/${win_arch}/boot/boot.sdi boot.sdi ||
-initrd -n boot.sdi    ${win_base_url}/${win_arch}/Boot/boot.sdi boot.sdi ||
-initrd -n boot.wim    ${win_base_url}/${win_arch}/sources/boot.wim boot.wim
+initrd -n bootmgr     ${win_base_url}/${winpe_arch}/bootmgr       bootmgr ||
+initrd -n bootmgr.efi ${win_base_url}/${winpe_arch}/bootmgr.efi   bootmgr.efi ||      
+initrd -n bcd         ${win_base_url}/${winpe_arch}/boot/bcd      bcd ||
+initrd -n bcd         ${win_base_url}/${winpe_arch}/Boot/BCD      bcd ||
+initrd -n boot.sdi    ${win_base_url}/${winpe_arch}/boot/boot.sdi boot.sdi ||
+initrd -n boot.sdi    ${win_base_url}/${winpe_arch}/Boot/boot.sdi boot.sdi ||
+initrd -n boot.wim    ${win_base_url}/${winpe_arch}/sources/boot.wim boot.wim
 boot
 
 :windows_exit
