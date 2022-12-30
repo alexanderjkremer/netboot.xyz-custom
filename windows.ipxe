@@ -5,7 +5,7 @@
 
 set winpe_arch x64
 set win_image Win11_English_x64
-set win_base_url $$win_base_url$$
+set win_base_url http://192.168.1.106:6969/WinPE
 goto ${menu} ||
 
 :windows
